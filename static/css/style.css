@@ -139,6 +139,14 @@ select:focus {
     background: rgba(255, 255, 255, 0.16);
 }
 
+.nav a.destaque {
+    background: #2563eb;
+}
+
+.nav a.destaque:hover {
+    background: #1d4ed8;
+}
+
 .header {
     height: 300px;
     display: flex;

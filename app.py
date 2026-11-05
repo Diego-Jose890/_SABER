@@ -33,11 +33,13 @@ def destino_seguro(destino):
 
 @app.route("/")
 def index():
-    if not current_user.is_authenticated:
-        return redirect(url_for("entrar"))
-    if current_user.is_admin:
+    if current_user.is_authenticated:
         return redirect(url_for("admin_painel"))
     return redirect(url_for("catalogo"))
+
+@app.route("/catalogo")
+def catalogo():
+    return render_template("catalogo.html")
 
 @app.route("/entrar", methods=["GET", "POST"])
 def entrar():
@@ -72,7 +74,7 @@ def entrar():
 def sair():
     logout_user()
     flash("Sessão encerrada.", "sucesso")
-    return redirect(url_for("entrar"))
+    return redirect(url_for("catalogo"))
 
 @app.route("/admin")
 @admin_required
@@ -89,19 +91,14 @@ def admin_painel():
         total_emprestimos=total_emprestimos,
     )
 
-@app.route("/catalogo")
-@login_required
-def catalogo():
-    return render_template("catalogo.html")
-
 def validar_livro(form, livro_id=None):
-    titulo = request.form.get("titulo", "").strip()
-    autor = request.form.get("autor", "").strip()
-    isbn = request.form.get("isbn", "").strip().replace("-", "").replace(" ", "")
-    imagem = request.form.get("imagem", "").strip()
+    titulo = form.get("titulo", "").strip()
+    autor = form.get("autor", "").strip()
+    isbn = form.get("isbn", "").strip().replace("-", "").replace(" ", "")
+    imagem = form.get("imagem", "").strip()
     
     generos_por_id = {str(g.id): g for g in models.listar_generos()}
-    genero = generos_por_id.get(request.form.get("id_genero", ""))
+    genero = generos_por_id.get(form.get("id_genero", ""))
     
     erros = []
     
@@ -116,9 +113,19 @@ def validar_livro(form, livro_id=None):
         erros.append("O autor deve ter no máximo 100 caracteres.")
     
     if not (isbn.isascii() and isbn.isdigit() and len(isbn) == 13):
-        erros.append("O ISBN deve ter 13 números.")    
+        erros.append("O ISBN deve ter 13 números.")  
+    else:
+        existente = models.buscar_livro_por_isbn(isbn)
+        if existente is not None and existente.id != livro_id:
+            erros.append("Já existe um livro com esse ISBN.")
+
     if not imagem:
-        erros.append("Informe a imagem.")
+        erros.append("Informe o link da imagem.")
+    elif not (imagem.startswith("http://") or imagem.startswith("https://")):
+        erros.append("O link da imagem deve começar com http:// ou https://.")
+    elif len(imagem) > 254:
+        erros.append("O link da imagem deve ter no máximo 254 caracteres.")
+
     if genero is None:
         erros.append("Selecione um gênero válido.")
 
@@ -133,7 +140,7 @@ def validar_livro(form, livro_id=None):
 
 @app.route("/admin/livros/novo", methods=["GET", "POST"])
 @admin_required
-def livro_novo():
+def admin_livro_novo():
     if request.method == "POST":
         erros, dados = validar_livro(request.form)
 

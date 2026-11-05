@@ -9,10 +9,10 @@ ADMINISTRADORES = [
 ]
 
 USUARIOS = [
-    {"nome": "Diego_Samuel", "senha": "diego1234", "telefone": "11987654321", "cpf": "12345678901", "email": "diego@gmail.com"},
-    {"nome": "Thalys_Rafael", "senha": "thalys1234", "telefone": "21976543210", "cpf": "98765432100", "email": "thalys@gmail.com"},
-    {"nome": "Paulo_Henrique", "senha": "paulo1234", "telefone": "21987654321", "cpf": "98765432101", "email": "paulo@gmail.com"},
-    {"nome": "Victor_Manoel", "senha": "victor1234", "telefone": "31965432109", "cpf": "45678912300", "email": "victor@gmail.com"},
+    {"nome": "Diego_Samuel", "telefone": "11987654321", "cpf": "12345678901"},
+    {"nome": "Thalys_Rafael", "telefone": "21976543210", "cpf": "98765432100"},
+    {"nome": "Paulo_Henrique", "telefone": "21987654321", "cpf": "98765432101"},
+    {"nome": "Victor_Manoel", "telefone": "31965432109", "cpf": "45678912300"},
 ]
 
 GENEROS = [
@@ -27,8 +27,8 @@ LIVROS = [
 ]
 
 EMPRESTIMOS = [
-    {"usuario": "diego@gmail.com", "isbn": "9788535902778", "retirada": datetime(2026, 3, 1, 10, 0), "prevista": datetime(2026, 3, 15, 10, 0), "real": None, "status": STATUS_ATIVO},
-    {"usuario": "thalys@gmail.com", "isbn": "9788576653929", "retirada": datetime(2026, 2, 10, 14, 30), "prevista": datetime(2026, 2, 24, 14, 30), "real": datetime(2026, 2, 22, 11, 15), "status": STATUS_DEVOLVIDO},
+    {"cpf": "12345678901", "isbn": "9788535902778", "retirada": datetime(2026, 3, 1, 10, 0), "prevista": datetime(2026, 3, 15, 10, 0), "real": None, "status": STATUS_ATIVO},
+    {"cpf": "98765432100", "isbn": "9788576653929", "retirada": datetime(2026, 2, 10, 14, 30), "prevista": datetime(2026, 2, 24, 14, 30), "real": datetime(2026, 2, 22, 11, 15), "status": STATUS_DEVOLVIDO},
 ]
 
 def popular_dados_exemplo():
@@ -46,9 +46,7 @@ def popular_dados_exemplo():
 
     if Usuario.query.count() == 0:
         for u in USUARIOS:
-            usuario = Usuario(nome=u["nome"], telefone=u["telefone"], cpf=u["cpf"], email=u["email"])
-            usuario.definir_senha(u["senha"])
-            db.session.add(usuario)
+            db.session.add(Usuario(nome=u["nome"], telefone=u["telefone"], cpf=u["cpf"]))
         db.session.commit()
 
     if Livro.query.count() == 0:
@@ -67,11 +65,11 @@ def popular_dados_exemplo():
         db.session.commit()
 
     if Emprestimo.query.count() == 0:
-        usuarios_por_email = {u.email: u for u in Usuario.query.all()}
+        usuarios_por_cpf = {u.cpf: u for u in Usuario.query.all()}
         livros_por_isbn = {l.isbn: l for l in Livro.query.all()}
         for e in EMPRESTIMOS:
             db.session.add(Emprestimo(
-                id_usuario=usuarios_por_email[e["usuario"]].id,
+                id_usuario=usuarios_por_cpf[e["cpf"]].id,
                 id_livro=livros_por_isbn[e["isbn"]].id,
                 data_retirada=e["retirada"],
                 data_devolucao_prevista=e["prevista"],

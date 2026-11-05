@@ -37,27 +37,12 @@ class Usuario(db.Model, UserMixin):
 
     id = db.Column(db.Integer, primary_key=True)
     nome = db.Column(db.String(25), nullable=False)
-    senha_hash = db.Column(db.String(255), nullable=False)
     telefone = db.Column(db.String(15))
     cpf = db.Column(db.String(14), unique=True, nullable=False)
-    email = db.Column(db.String(254), unique=True, nullable=False)
     data_criacao = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
-
-    def definir_senha(self, senha):
-        self.senha_hash = generate_password_hash(senha)
-
-    def verificar_senha(self, senha):
-        return check_password_hash(self.senha_hash, senha)
-
-    def get_id(self):
-        return f"{TIPO_USUARIO}:{self.id}"
- 
-    @property
-    def is_admin(self):
-        return False
  
     def __repr__(self):
-        return f"<Usuario {self.id} - {self.email}>"
+        return f"<Usuario {self.id} - {self.nome}>"
 
 class Administrador(db.Model, UserMixin):
     __tablename__ = "administrador"
@@ -73,9 +58,6 @@ class Administrador(db.Model, UserMixin):
  
     def verificar_senha(self, senha):
         return check_password_hash(self.senha_hash, senha)
- 
-    def get_id(self):
-        return f"{TIPO_ADMIN}:{self.id}"
  
     @property
     def is_admin(self):
@@ -139,26 +121,13 @@ class Emprestimo(db.Model):
 
 def carregar_conta(identificador):
     try:
-        tipo, id_texto = identificador.split(":")
-        id_conta = int(id_texto)
+        id_conta = int(identificador)
     except (ValueError, AttributeError):
         return None
-
-    if tipo == TIPO_ADMIN:
-        return db.session.get(Administrador, id_conta)
-    if tipo == TIPO_USUARIO:
-        return db.session.get(Usuario, id_conta)
-    return None
+    return db.session.get(Administrador, id_conta)
 
 def buscar_conta_por_email(email):
-    conta = Administrador.query.filter_by(email=email).first()
-    if conta is None:
-        conta = Usuario.query.filter_by(email=email).first()
-    return conta
-
-# O mesmo e-mail não pode estar nas duas tabelas diferentes, pois isso, essa função garante isso no cadastro
-def email_em_uso(email):
-    return buscar_conta_por_email(email) is not None
+    return Administrador.query.filter_by(email=email).first()
 
 def listar_generos():
     return Genero.query.order_by(Genero.nome).all()
