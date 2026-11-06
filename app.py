@@ -41,7 +41,7 @@ def index():
 def catalogo():
     return render_template("catalogo.html")
 
-@app.route("/entrar", methods=["GET", "POST"])
+@app.route("/portal_interno_login", methods=["GET", "POST"])
 def entrar():
     if current_user.is_authenticated:
         return redirect(url_for("index"))

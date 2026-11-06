@@ -16,35 +16,6 @@ a {
     color: inherit;
 }
 
-.login {
-    min-height: 100vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 20px;
-}
-
-.login-box {
-    width: min(430px, 100%);
-    background: white;
-    color: #17242d;
-    border-radius: 14px;
-    padding: 30px;
-    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.25);
-}
-
-.login-box h1 {
-    text-align: center;
-    font-size: 34px;
-    margin-bottom: 8px;
-}
-
-.login-box p {
-    text-align: center;
-    color: #66737c;
-    margin-bottom: 25px;
-}
-
 .field {
     display: flex;
     flex-direction: column;
@@ -352,4 +323,236 @@ td {
 
 .botao-olho svg[hidden] {
     display: none;
+}
+
+.login-container {
+    position: relative;
+    display: flex;
+    min-height: 100vh;
+    background: #001a3b;
+}
+
+.login-container * {
+    font-family: 'Aileron', Arial, sans-serif;
+}
+
+.login-imagem {
+    position: relative;
+    width: 48.2%;
+    overflow: hidden;
+    background: #102b4b;
+}
+
+.login-imagem-fundo {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+}
+
+.login-imagem-escura {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 15, 40, 0.25);
+    z-index: 1;
+}
+
+.login-logo {
+    position: absolute;
+    top: 35px;
+    left: 35px;
+    z-index: 2;
+    width: clamp(220px, 24vw, 330px);
+}
+
+.login-logo img {
+    display: block;
+    width: 100%;
+    filter: brightness(0) invert(1);
+}
+
+.login-painel {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 51.8%;
+    color: white;
+    background: linear-gradient(135deg, #002653, #00132d);
+}
+
+.login-conteudo {
+    width: 67%;
+    max-width: 410px;
+}
+
+.login-conteudo h2 {
+    margin-bottom: 25px;
+    font-size: 40px;
+    font-weight: 700;
+}
+
+.login-texto {
+    margin-bottom: 19px;
+    font-size: 11px;
+}
+
+.login-campo {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 17px;
+}
+
+.login-campo label {
+    margin: 0 0 5px 4px;
+    color: #19b7ff;
+    font-size: 14px;
+    font-weight: 400;
+    letter-spacing: 1px;
+}
+
+.login-campo input {
+    width: 100%;
+    height: 65px;
+    padding: 0 28px;
+    border: 2px solid #073b78;
+    border-radius: 13px;
+    outline: none;
+    background: rgba(13, 48, 91, 0.65);
+    box-shadow: inset 0 0 8px rgba(0, 100, 255, 0.12);
+    color: white;
+    font-size: 17px;
+    font-weight: 600;
+    transition: 0.3s;
+}
+
+.login-campo input::placeholder {
+    color: rgba(255, 255, 255, 0.55);
+}
+
+.login-campo input:focus {
+    border-color: #168cff;
+    box-shadow: 0 0 12px rgba(0, 125, 255, 0.35);
+}
+
+.login-campo .campo-senha input {
+    padding-right: 64px;
+}
+
+.login-campo .botao-olho {
+    right: 16px;
+    width: 36px;
+    height: 36px;
+    color: #19b7ff;
+}
+
+.login-campo .botao-olho:hover {
+    color: #53aaff;
+    background: rgba(255, 255, 255, 0.08);
+}
+
+.login-campo .botao-olho svg {
+    width: 22px;
+    height: 22px;
+}
+
+.login-botao {
+    display: block;
+    width: 78%;
+    height: 55px;
+    margin: 25px auto 0;
+    border: none;
+    border-radius: 10px;
+    background: linear-gradient(180deg, #3295ff, #0061e9);
+    box-shadow: 0 0 12px rgba(0, 119, 255, 0.65), inset 0 1px 4px rgba(255, 255, 255, 0.3);
+    color: white;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.login-botao:hover {
+    background: linear-gradient(180deg, #53aaff, #0874ff);
+    transform: translateY(-2px);
+}
+
+.login-avisos {
+    margin-top: 29px;
+}
+
+.login-aviso {
+    margin-bottom: 6px;
+    text-align: center;
+    font-size: 12px;
+    font-weight: 400;
+}
+
+.login-aviso.erro {
+    color: #ffb4b4;
+}
+
+.login-aviso.sucesso {
+    color: #86efac;
+}
+
+.login-voltar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 13px;
+    width: 100%;
+    height: 44px;
+    margin-top: 25px;
+    border: 1.5px solid #526174;
+    border-radius: 7px;
+    font-size: 15px;
+    transition: 0.3s;
+}
+
+.login-voltar:hover {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: #8ba9ca;
+}
+
+.login-voltar svg {
+    width: 20px;
+    height: 20px;
+}
+
+@media (max-width: 768px) {
+    .login-imagem {
+        display: none;
+    }
+
+    .login-logo {
+        top: 25px;
+        left: 25px;
+        width: 200px;
+    }
+
+    .login-painel {
+        width: 100%;
+        padding: 120px 25px 25px;
+    }
+
+    .login-conteudo {
+        width: 100%;
+    }
+
+    .login-conteudo h2 {
+        font-size: 35px;
+    }
+}
+
+@media (min-width: 769px) and (max-width: 1000px) {
+    .login-conteudo {
+        width: 80%;
+    }
+
+    .login-campo input {
+        height: 58px;
+    }
 }
