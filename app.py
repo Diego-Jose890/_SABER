@@ -23,7 +23,6 @@ def carregar_usuario(identificador):
     return models.carregar_conta(identificador)
 
 def destino_seguro(destino):
-    #Só aceita redirecionar para caminhos DESTE site (ex.: /admin), recusando qualquer outro
     return (
         bool(destino)
         and destino.startswith("/")

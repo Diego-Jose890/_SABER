@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+
+{% block nav %}{% endblock %}
+{% block mensagens %}{% endblock %}
+{% block conteudo %}
+<div class="admin-layout">
+    <header class="admin-topo">
+        <a href="{{ url_for('admin_painel') }}" class="admin-topo-logo">
+            <img src="{{ url_for('static', filename='img/logo_SABER.png') }}" alt="SABER">
+        </a>
+        <a href="{{ url_for('sair') }}" class="admin-sair" title="Sair" aria-label="Sair">
+            <svg class="admin-icone" viewBox="0 0 24 24"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path><polyline points="10 17 15 12 10 7"></polyline><line x1="15" y1="12" x2="3" y2="12"></line></svg>
+        </a>
+    </header>
+
+    <div class="admin-corpo">
+        <aside class="admin-menu">
+            <nav>
+                {# Os links com '#' ainda não têm rota. Troque por url_for('...') quando existirem #}
+                <a href="{{ url_for('admin_painel') }}" title="Início" class="admin-menu-item{% if menu_ativo == 'inicio' %} ativo{% endif %}">
+                    <svg class="admin-icone" viewBox="0 0 24 24"><path d="M12 2.5 2.5 10.5V22H9v-7h6v7h6.5V10.5z" fill="currentColor" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"></path></svg>
+                    <span class="admin-menu-texto">Início</span>
+                </a>
+
+                <a href="#" title="Acervo" class="admin-menu-item{% if menu_ativo == 'acervo' %} ativo{% endif %}">
+                    <svg class="admin-icone" viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path></svg>
+                    <span class="admin-menu-texto">Acervo</span>
+                </a>
+
+                <a href="{{ url_for('admin_livro_novo') }}" title="Cadastrar" class="admin-menu-item{% if menu_ativo == 'cadastrar' %} ativo{% endif %}">
+                    <svg class="admin-icone" viewBox="0 0 24 24"><line x1="12" y1="4" x2="12" y2="20" stroke-width="3"></line><line x1="4" y1="12" x2="20" y2="12" stroke-width="3"></line></svg>
+                    <span class="admin-menu-texto">Cadastrar</span>
+                </a>
+
+                <a href="#" title="Empréstimos" class="admin-menu-item{% if menu_ativo == 'emprestimos' %} ativo{% endif %}">
+                    <svg class="admin-icone" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                    <span class="admin-menu-texto">Empréstimos</span>
+                </a>
+
+                <a href="#" title="Excluídos" class="admin-menu-item{% if menu_ativo == 'excluidos' %} ativo{% endif %}">
+                    <svg class="admin-icone" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
+                    <span class="admin-menu-texto">Excluídos</span>
+                </a>
+
+                <a href="#" title="Edição" class="admin-menu-item{% if menu_ativo == 'edicao' %} ativo{% endif %}">
+                    <svg class="admin-icone" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                    <span class="admin-menu-texto">Edição</span>
+                </a>
+
+                <a href="#" title="Usuários" class="admin-menu-item{% if menu_ativo == 'usuarios' %} ativo{% endif %}">
+                    <svg class="admin-icone" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                    <span class="admin-menu-texto">Usuários</span>
+                </a>
+            </nav>
+        </aside>
+
+        <main class="admin-conteudo">
+            {% with mensagens = get_flashed_messages(with_categories=true) %}
+            {% for categoria, texto in mensagens %}
+            <div class="message {{ categoria }}">{{ texto }}</div>
+            {% endfor %}
+            {% endwith %}
+
+            {% block admin_conteudo %}{% endblock %}
+        </main>
+    </div>
+</div>
+{% endblock %}
