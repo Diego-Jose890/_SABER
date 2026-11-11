@@ -20,22 +20,15 @@ GENEROS = [
     "Juvenil", "Mistério", "Poesia", "Romance", "Suspense", "Terror", "Thriller", "Novela", "Autobiografia",
 ]
 
-LIVROS = [
-    {"titulo": "O Alquimista", "autor": "Paulo Coelho", "isbn": "9788576653929", "imagem": "https://placehold.co/200x300?text=O+Alquimista", "genero": "Romance", "disponibilidade": True},
-    {"titulo": "Dom Casmurro", "autor": "Machado de Assis", "isbn": "9788535902778", "imagem": "https://placehold.co/200x300?text=Dom+Casmurro", "genero": "Clássico", "disponibilidade": False},  # está emprestado
-    {"titulo": "1984", "autor": "George Orwell", "isbn": "9788535914849", "imagem": "https://placehold.co/200x300?text=1984", "genero": "Ficção Científica", "disponibilidade": True},
-]
+LIVROS = []
 
-EMPRESTIMOS = [
-    {"cpf": "12345678901", "isbn": "9788535902778", "retirada": datetime(2026, 3, 1, 10, 0), "prevista": datetime(2026, 3, 15, 10, 0), "real": None, "status": STATUS_ATIVO},
-    {"cpf": "98765432100", "isbn": "9788576653929", "retirada": datetime(2026, 2, 10, 14, 30), "prevista": datetime(2026, 2, 24, 14, 30), "real": datetime(2026, 2, 22, 11, 15), "status": STATUS_DEVOLVIDO},
-]
+EMPRESTIMOS = []
 
 def popular_dados_exemplo():
     if Administrador.query.count() == 0:
-        for a in ADMINISTRADORES:
-            admin = Administrador(nome=a["nome"], email=a["email"])
-            admin.definir_senha(a["senha"])
+        for item in ADMINISTRADORES:
+            admin = Administrador(nome=item["nome"], email=item["email"])
+            admin.definir_senha(item["senha"])
             db.session.add(admin)
         db.session.commit()
 
@@ -45,36 +38,11 @@ def popular_dados_exemplo():
         db.session.commit()
 
     if Usuario.query.count() == 0:
-        for u in USUARIOS:
-            db.session.add(Usuario(nome=u["nome"], telefone=u["telefone"], cpf=u["cpf"]))
-        db.session.commit()
-
-    if Livro.query.count() == 0:
-        generos_por_nome = {g.nome: g for g in Genero.query.all()}
-        admin = Administrador.query.first()
-        for l in LIVROS:
-            db.session.add(Livro(
-                titulo=l["titulo"],
-                autor=l["autor"],
-                isbn=l["isbn"],
-                imagem=l["imagem"],
-                id_genero=generos_por_nome[l["genero"]].id,
-                id_administrador_cadastro=admin.id if admin else None,
-                disponibilidade=l["disponibilidade"],
-            ))
-        db.session.commit()
-
-    if Emprestimo.query.count() == 0:
-        usuarios_por_cpf = {u.cpf: u for u in Usuario.query.all()}
-        livros_por_isbn = {l.isbn: l for l in Livro.query.all()}
-        for e in EMPRESTIMOS:
-            db.session.add(Emprestimo(
-                id_usuario=usuarios_por_cpf[e["cpf"]].id,
-                id_livro=livros_por_isbn[e["isbn"]].id,
-                data_retirada=e["retirada"],
-                data_devolucao_prevista=e["prevista"],
-                data_devolucao_real=e["real"],
-                status=e["status"],
+        for item in USUARIOS:
+            db.session.add(Usuario(
+                nome=item["nome"],
+                telefone=item["telefone"],
+                cpf=item["cpf"],
             ))
         db.session.commit()
 
@@ -83,4 +51,4 @@ if __name__ == "__main__":
 
     with app.app_context():
         popular_dados_exemplo()
-        print("Banco populado com administrador, usuários, gêneros, livros e empréstimos de TESTE.")
+        print("Banco populado com administrador, usuários e gêneros. Os empréstimos e livros devem ser cadastrados só com as imagens.")

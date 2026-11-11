@@ -37,7 +37,7 @@ class Usuario(db.Model, UserMixin):
 
     id = db.Column(db.Integer, primary_key=True)
     nome = db.Column(db.String(25), nullable=False)
-    telefone = db.Column(db.String(15))
+    telefone = db.Column(db.String(15), nullable=False)
     cpf = db.Column(db.String(14), unique=True, nullable=False)
     data_criacao = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
  
@@ -116,6 +116,10 @@ class Emprestimo(db.Model):
     status = db.Column(db.String(20), default=STATUS_ATIVO, nullable=False)
     data_solicitacao = db.Column(db.DateTime, default=datetime.utcnow)
 
+    @property
+    def atrasado(self):
+        return self.status == STATUS_ATIVO and datetime.utcnow() > self.data_devolucao_prevista
+    
     def __repr__(self):
         return f"<Emprestimo {self.id} - livro {self.id_livro} / usuário {self.id_usuario}>"
 
@@ -137,6 +141,28 @@ def buscar_livro(livro_id):
 
 def buscar_livro_por_isbn(isbn):
     return Livro.query.filter_by(isbn=isbn).first()
+
+def listar_livros(busca="", genero_id=None, ordem="recentes", disponibilidade=None, status=True):
+    consulta = Livro.query.filter_by(status=status)
+    if busca:
+        termo = f"%{busca}%"
+        consulta = consulta.filter(db.or_(Livro.titulo.ilike(termo), Livro.autor.ilike(termo)))
+    if genero_id:
+        consulta = consulta.filter_by(id_genero=genero_id)
+    if disponibilidade == "disponiveis":
+        consulta = consulta.filter_by(disponibilidade=True)
+    elif disponibilidade == "emprestados":
+        consulta = consulta.filter_by(disponibilidade=False)
+
+    if ordem == "titulo_az":
+        consulta = consulta.order_by(Livro.titulo.asc())
+    elif ordem == "titulo_za":
+        consulta = consulta.order_by(Livro.titulo.desc())
+    elif ordem == "disponiveis":
+        consulta = consulta.order_by(Livro.disponibilidade.desc(), Livro.titulo.asc())
+    else:
+        consulta = consulta.order_by(Livro.id.desc())
+    return consulta.all()
 
 def criar_livro(titulo, autor, isbn, imagem, id_genero, id_administrador):
     livro = Livro(
@@ -160,4 +186,87 @@ def atualizar_livro(livro_id, titulo, autor, isbn, imagem, id_genero):
     livro.id_genero = id_genero
     db.session.commit()
 
-# Continuem com as outras funções abaixo
+def buscar_usuario(usuario_id):
+    return db.session.get(Usuario, usuario_id)
+
+def buscar_usuario_por_cpf(cpf):
+    return Usuario.query.filter_by(cpf=cpf).first()
+
+def listar_usuarios(busca=""):
+    consulta = Usuario.query
+    if busca:
+        termo = f"%{busca}%"
+        consulta = consulta.filter(db.or_(Usuario.nome.ilike(termo), Usuario.cpf.ilike(termo), Usuario.telefone.ilike(termo)))
+    return consulta.order_by(Usuario.nome.asc()).all()
+
+def criar_usuario(nome, telefone, cpf):
+    usuario = Usuario(
+        nome=nome, 
+        telefone=telefone, 
+        cpf=cpf
+    )
+    db.session.add(usuario)
+    db.session.commit()
+    return usuario.id
+
+def buscar_emprestimo(emprestimo_id):
+    return db.session.get(Emprestimo, emprestimo_id)
+
+def listar_emprestimos(status=None, busca=""):
+    consulta = Emprestimo.query.join(Usuario).join(Livro)
+    if status in (STATUS_ATIVO, STATUS_DEVOLVIDO):
+        consulta = consulta.filter(Emprestimo.status == status)
+    if busca:
+        termo = f"%{busca}%"
+        consulta = consulta.filter(db.or_(Livro.titulo.ilike(termo), Usuario.nome.ilike(termo), Usuario.cpf.ilike(termo)))
+    return consulta.order_by(Emprestimo.data_solicitacao.desc()).all()
+
+def emprestimo_ativo_do_usuario(usuario_id):
+    return Emprestimo.query.filter_by(id_usuario=usuario_id, status=STATUS_ATIVO).first()
+
+def emprestimo_ativo_do_livro(livro_id):
+    return Emprestimo.query.filter_by(id_livro=livro_id, status=STATUS_ATIVO).first()
+
+def criar_emprestimo(usuario_id, livro_id, data_retirada, data_devolucao_prevista):
+    usuario = buscar_usuario(usuario_id)
+    livro = buscar_livro(livro_id)
+    if usuario is None or livro is None:
+        raise ValueError("Usuário ou livro não encontrado.")
+    if not livro.status:
+        raise ValueError("Este livro está removido do acervo.")
+    if not livro.disponibilidade or emprestimo_ativo_do_livro(livro_id):
+        raise ValueError("Este livro não está disponível para empréstimo.")
+    if emprestimo_ativo_do_usuario(usuario_id):
+        raise ValueError("Este usuário já possui um empréstimo ativo.")
+    if data_devolucao_prevista <= data_retirada:
+        raise ValueError("A devolução prevista deve ser posterior à retirada.")
+
+    emprestimo = Emprestimo(
+        id_usuario=usuario_id,
+        id_livro=livro_id,
+        data_retirada=data_retirada,
+        data_devolucao_prevista=data_devolucao_prevista,
+        status=STATUS_ATIVO,
+    )
+    livro.disponibilidade = False
+    db.session.add(emprestimo)
+    db.session.commit()
+    return emprestimo.id
+
+def registrar_devolucao(emprestimo_id, data_devolucao=None):
+    emprestimo = buscar_emprestimo(emprestimo_id)
+    if emprestimo is None:
+        raise ValueError("Empréstimo não encontrado.")
+    if emprestimo.status != STATUS_ATIVO:
+        raise ValueError("Este empréstimo já foi encerrado.")
+    data_devolucao = data_devolucao or datetime.utcnow()
+    if data_devolucao < emprestimo.data_retirada:
+        raise ValueError("A devolução não pode ser anterior à retirada.")
+
+    emprestimo.status = STATUS_DEVOLVIDO
+    emprestimo.data_devolucao_real = data_devolucao
+    emprestimo.livro.disponibilidade = True
+    db.session.commit()
+    return True
+
+#Continuem com outras funções abaixo
