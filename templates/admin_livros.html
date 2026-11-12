@@ -1,0 +1,55 @@
+{% extends "base_admin.html" %}
+{% set menu_ativo = "acervo" %}
+
+{% block titulo %}Acervo - SABER{% endblock %}
+
+{% block admin_conteudo %}
+<div class="admin-linha"></div>
+
+<div class="acervo-cabecalho">
+    <div>
+        <h1 class="admin-titulo">Acervo de livros</h1>
+        <p class="admin-subtitulo">Livros atualmente cadastrados na biblioteca</p>
+    </div>
+
+    <a href="{{ url_for('admin_livro_novo') }}" class="btn primary">
+        Cadastrar livro
+    </a>
+</div>
+
+{% if livros %}
+    <div class="acervo-lista">
+        {% for livro in livros %}
+            <article class="admin-card livro-admin-card">
+                <img
+                    class="acervo-capa"
+                    src="{{ url_for('static', filename=livro.imagem) }}"
+                    alt="Capa de {{ livro.titulo }}"
+                    loading="lazy"
+                >
+
+                <div class="admin-card-texto">
+                    <h2>{{ livro.titulo }}</h2>
+                    <p><strong>Autor:</strong> {{ livro.autor }}</p>
+                    <p><strong>Gênero:</strong> {{ livro.genero.nome }}</p>
+                    <p><strong>ISBN:</strong> {{ livro.isbn }}</p>
+
+                    {% if livro.disponibilidade %}
+                        <span class="acervo-status disponivel">Disponível</span>
+                    {% else %}
+                        <span class="acervo-status emprestado">Emprestado</span>
+                    {% endif %}
+                </div>
+            </article>
+        {% endfor %}
+    </div>
+{% else %}
+    <div class="acervo-vazio">
+        <h2>Nenhum livro cadastrado</h2>
+        <p>Quando um livro for cadastrado, ele aparecerá nesta página.</p>
+        <a href="{{ url_for('admin_livro_novo') }}" class="btn primary">
+            Cadastrar primeiro livro
+        </a>
+    </div>
+{% endif %}
+{% endblock %}

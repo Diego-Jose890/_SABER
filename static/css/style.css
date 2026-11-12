@@ -835,3 +835,375 @@ td {
         display: none;
     }
 }
+
+.cadastro-erros {
+    margin: 0 0 20px;
+    padding: 13px 17px;
+    border: 1px solid #fecaca;
+    border-radius: 10px;
+    background: #fff1f2;
+    color: #991b1b;
+    font-size: 14px;
+}
+
+.cadastro-erros ul {
+    margin: 7px 0 0 20px;
+}
+
+.cadastro-livro {
+    display: grid;
+    grid-template-columns: minmax(190px, 240px) minmax(0, 1fr);
+    gap: 32px;
+    width: min(100%, 900px);
+    margin: 0 auto;
+    padding: 28px;
+    border-radius: 18px;
+    background: white;
+    box-shadow: 0 12px 32px rgba(24, 67, 112, 0.08);
+}
+
+.cadastro-capa {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-width: 0;
+    gap: 10px;
+}
+
+.cadastro-capa input[type="file"] {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    clip-path: inset(50%);
+}
+
+.capa-seletor {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+    width: 100%;
+    min-height: 330px;
+    padding: 18px;
+    overflow: hidden;
+    border: 2px dashed #b9d2f5;
+    border-radius: 9px;
+    background: #eaf2ff;
+    color: #173a5d;
+    cursor: pointer;
+    text-align: center;
+    transition: 0.2s;
+}
+
+.capa-seletor:hover,
+.cadastro-capa input:focus-visible + .capa-seletor {
+    border-color: #2879dc;
+    background: #e2edff;
+}
+
+.capa-icone {
+    width: 58px;
+    height: 58px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2.5;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+#capa-preview {
+    display: block;
+    width: 100%;
+    height: 290px;
+    object-fit: contain;
+}
+
+#capa-preview[hidden],
+.capa-icone[hidden] {
+    display: none;
+}
+
+#capa-texto {
+    max-width: 100%;
+    overflow-wrap: anywhere;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.campo-ajuda {
+    color: #647b93;
+    font-size: 12px;
+    line-height: 1.4;
+}
+
+.campo-erro {
+    min-height: 0;
+    color: #b42318;
+    font-size: 12px;
+    line-height: 1.35;
+}
+
+.cadastro-campos {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    min-width: 0;
+}
+
+.cadastro-campo {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+    margin-bottom: 14px;
+}
+
+.cadastro-campo label {
+    color: #084080;
+    font-size: 16px;
+    font-weight: 700;
+}
+
+.cadastro-campo input,
+.cadastro-campo select {
+    width: 100%;
+    min-height: 42px;
+    padding: 9px 12px;
+    border: 1.5px solid #c9ddff;
+    border-radius: 8px;
+    background: white;
+    color: #142e49;
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.cadastro-campo input:focus,
+.cadastro-campo select:focus {
+    border-color: #176cff;
+    box-shadow: 0 0 0 3px rgba(23, 108, 255, 0.10);
+}
+
+.cadastro-campo .invalido {
+    border-color: #dc2626;
+}
+
+.cadastro-botao {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 9px;
+    width: fit-content;
+    min-width: 170px;
+    min-height: 46px;
+    margin: 12px auto 0;
+    padding: 10px 19px;
+    border: 0;
+    border-radius: 9px;
+    background: linear-gradient(180deg, #1682ff, #0637f5);
+    color: white;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.cadastro-botao svg {
+    width: 22px;
+    height: 22px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.5;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+.cadastro-botao:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 14px rgba(0, 65, 255, 0.22);
+}
+
+/* Aviso de cadastro concluído: aparece após o redirect da rota. */
+.admin-layout .admin-conteudo > .message.sucesso {
+    position: fixed;
+    top: 72px;
+    right: 24px;
+    z-index: 30;
+    width: min(390px, calc(100vw - 32px));
+    padding: 14px 18px;
+    border: 1px solid #86d5a1;
+    border-radius: 10px;
+    background: #edfff2;
+    color: #166534;
+    box-shadow: 0 12px 30px rgba(15, 45, 30, 0.18);
+}
+
+/* Confirmação ao tentar sair com o formulário preenchido. */
+.cadastro-modal[hidden] {
+    display: none;
+}
+
+.cadastro-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 50;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    background: rgba(3, 19, 38, 0.58);
+}
+
+.cadastro-modal-conteudo {
+    width: min(100%, 430px);
+    padding: 26px;
+    border-radius: 15px;
+    background: white;
+    color: #142e49;
+    box-shadow: 0 18px 50px rgba(0, 0, 0, 0.22);
+}
+
+.cadastro-modal-conteudo h2 {
+    margin-bottom: 10px;
+    font-size: 22px;
+}
+
+.cadastro-modal-conteudo p {
+    color: #60768d;
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+.cadastro-modal-acoes {
+    display: flex;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 22px;
+}
+
+.cadastro-modal-acoes button {
+    padding: 10px 14px;
+    border: 0;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.cadastro-modal-voltar {
+    background: #e8eef7;
+    color: #17334e;
+}
+
+.cadastro-modal-sair {
+    background: #b42318;
+    color: white;
+}
+
+@media (max-width: 700px) {
+    .cadastro-livro {
+        grid-template-columns: 1fr;
+        gap: 22px;
+        padding: 20px;
+    }
+
+    .capa-seletor {
+        min-height: 190px;
+    }
+
+    #capa-preview {
+        height: 160px;
+    }
+
+    .cadastro-botao {
+        width: 100%;
+    }
+}
+
+/* Para a tela provisório de administrador da tabela dos livros */
+
+.acervo-cabecalho {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 25px;
+}
+
+.acervo-cabecalho .admin-subtitulo {
+    margin-bottom: 0;
+}
+
+.acervo-lista {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 20px;
+}
+
+.livro-admin-card {
+    align-items: flex-start;
+    padding: 18px;
+}
+
+.acervo-capa {
+    width: 85px;
+    height: 125px;
+    flex-shrink: 0;
+    object-fit: cover;
+    border-radius: 7px;
+    background: #edf3ff;
+}
+
+.livro-admin-card .admin-card-texto h2 {
+    font-size: 19px;
+    overflow-wrap: anywhere;
+}
+
+.livro-admin-card .admin-card-texto p {
+    margin-bottom: 5px;
+    overflow-wrap: anywhere;
+}
+
+.acervo-status {
+    display: inline-block;
+    margin-top: 10px;
+    padding: 5px 10px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.acervo-status.disponivel {
+    background: #dcfce7;
+    color: #166534;
+}
+
+.acervo-status.emprestado {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+.acervo-vazio {
+    padding: 35px;
+    border-radius: 16px;
+    background: white;
+    color: #142e49;
+    text-align: center;
+}
+
+.acervo-vazio p {
+    margin: 12px 0 20px;
+    color: #60768d;
+}
+
+@media (max-width: 650px) {
+    .acervo-cabecalho {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+}

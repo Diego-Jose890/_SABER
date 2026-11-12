@@ -1,0 +1,209 @@
+{% extends "base_admin.html" %}
+{% set menu_ativo = "cadastrar" %}
+
+{% block titulo %}Cadastrar livro - SABER{% endblock %}
+
+{% block admin_conteudo %}
+
+<div class="admin-linha"></div>
+<h1 class="admin-titulo">Cadastro de livro</h1>
+<p class="admin-subtitulo">Adicione um novo livro ao acervo da biblioteca.</p>
+
+{% if erros %}
+    <div class="cadastro-erros" role="alert">
+        <strong>Não foi possível cadastrar o livro:</strong>
+        <ul>
+            {% for erro in erros %}
+                <li>{{ erro }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+{% endif %}
+
+<form class="cadastro-livro" method="POST" action="{{ url_for('admin_livro_novo') }}" enctype="multipart/form-data">
+    <div class="cadastro-capa">
+        <input
+            type="file"
+            id="imagem"
+            name="imagem"
+            accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp"
+            aria-label="Selecionar imagem da capa"
+            aria-describedby="imagem-ajuda"
+        >
+        <label for="imagem" class="capa-seletor">
+            <img id="capa-preview" alt="Pré-visualização da capa selecionada" hidden>
+            <svg id="capa-icone" class="capa-icone" viewBox="0 0 64 64" aria-hidden="true">
+                <rect x="5" y="9" width="54" height="46" rx="3"></rect>
+                <circle cx="33" cy="20" r="5"></circle>
+                <path d="M7 45 21 30 32 41 40 33 58 51"></path>
+            </svg>
+            <span id="capa-texto">Selecionar capa</span>
+        </label>
+        <p id="imagem-ajuda" class="campo-ajuda">JPG, PNG ou WEBP. Tamanho máximo de 5 MB.</p>
+    </div>
+
+    <div class="cadastro-campos">
+        <div class="cadastro-campo">
+            <label for="titulo">Título</label>
+            <input
+                type="text"
+                id="titulo"
+                name="titulo"
+                maxlength="100"
+                value="{{ valores.get('titulo', '') }}"
+                placeholder="Digite o título do livro"
+                required
+            >
+        </div>
+
+        <div class="cadastro-campo">
+            <label for="autor">Autor</label>
+            <input
+                type="text"
+                id="autor"
+                name="autor"
+                maxlength="100"
+                value="{{ valores.get('autor', '') }}"
+                placeholder="Digite o nome do autor"
+                required
+            >
+        </div>
+
+        <div class="cadastro-campo">
+            <label for="isbn">ISBN</label>
+            <input
+                type="text"
+                id="isbn"
+                name="isbn"
+                maxlength="17"
+                inputmode="numeric"
+                value="{{ valores.get('isbn', '') }}"
+                placeholder="Informe o ISBN-13"
+                required
+            >
+            <small class="campo-ajuda">Informe os 13 números do ISBN. Hífens também são aceitos.</small>
+        </div>
+
+        <div class="cadastro-campo">
+            <label for="id_genero">Gênero</label>
+            <select id="id_genero" name="id_genero" required>
+                <option value="" disabled {% if not valores.get('id_genero') %}selected{% endif %}>
+                    Selecione um gênero
+                </option>
+                {% for genero in generos %}
+                    <option
+                        value="{{ genero.id }}"
+                        {% if valores.get('id_genero', '')|string == genero.id|string %}selected{% endif %}
+                    >
+                        {{ genero.nome }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <button type="submit" class="cadastro-botao">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M3 4.5h5a4 4 0 0 1 4 4V21a4 4 0 0 0-4-3H3z"></path>
+                <path d="M21 4.5h-5a4 4 0 0 0-4 4V21a4 4 0 0 1 4-3h5z"></path>
+            </svg>
+            Cadastrar livro
+        </button>
+    </div>
+</form>
+
+<div id="confirmar-saida" class="cadastro-modal" hidden>
+    <div class="cadastro-modal-conteudo" role="dialog" aria-modal="true" aria-labelledby="saida-titulo">
+        <h2 id="saida-titulo">Sair sem finalizar?</h2>
+        <p>As informações preenchidas não serão cadastradas. Deseja realmente sair desta página?</p>
+        <div class="cadastro-modal-acoes">
+            <button type="button" id="continuar-cadastro" class="cadastro-modal-voltar">
+                Continuar preenchendo
+            </button>
+            <button type="button" id="sair-cadastro" class="cadastro-modal-sair">
+                Sair da página
+            </button>
+        </div>
+    </div>
+</div>
+
+<script>
+    const formulario = document.querySelector(".cadastro-livro");
+    const modalSaida = document.getElementById("confirmar-saida");
+    const arquivoImagem = document.getElementById("imagem");
+    const preview = document.getElementById("capa-preview");
+    const iconeCapa = document.getElementById("capa-icone");
+    const textoCapa = document.getElementById("capa-texto");
+    let imagemTemporaria = null;
+    let formularioAlterado = {{ 'true' if erros or valores.get('titulo') or valores.get('autor') or valores.get('isbn') or valores.get('id_genero') else 'false' }};
+    let podeSair = false;
+    let destinoPendente = "";
+
+    formulario.addEventListener("input", () => formularioAlterado = true);
+    formulario.addEventListener("change", () => formularioAlterado = true);
+
+    arquivoImagem.addEventListener("change", () => {
+        const arquivo = arquivoImagem.files[0];
+        formularioAlterado = true;
+
+        if (imagemTemporaria) {
+            URL.revokeObjectURL(imagemTemporaria);
+            imagemTemporaria = null;
+        }
+
+        if (!arquivo) {
+            preview.hidden = true;
+            preview.removeAttribute("src");
+            iconeCapa.hidden = false;
+            textoCapa.textContent = "Selecionar capa";
+            return;
+        }
+
+        imagemTemporaria = URL.createObjectURL(arquivo);
+        preview.onload = () => {
+            preview.hidden = false;
+            iconeCapa.hidden = true;
+            textoCapa.textContent = arquivo.name;
+        };
+        preview.onerror = () => {
+            preview.hidden = true;
+            iconeCapa.hidden = false;
+            textoCapa.textContent = "Não foi possível pré-visualizar esta imagem";
+        };
+        preview.src = imagemTemporaria;
+    });
+
+    formulario.addEventListener("submit", () => {
+        podeSair = true;
+    });
+
+    document.addEventListener("click", evento => {
+        const link = evento.target.closest("a[href]");
+
+        if (!link || !formularioAlterado || podeSair) return;
+        if (link.getAttribute("href") === "#" || link.target === "_blank" || link.hasAttribute("download")) return;
+
+        evento.preventDefault();
+        destinoPendente = link.href;
+        modalSaida.hidden = false;
+        document.getElementById("continuar-cadastro").focus();
+    });
+
+    document.getElementById("continuar-cadastro").addEventListener("click", () => {
+        modalSaida.hidden = true;
+        destinoPendente = "";
+    });
+
+    document.getElementById("sair-cadastro").addEventListener("click", () => {
+        podeSair = true;
+        window.location.href = destinoPendente;
+    });
+
+    window.addEventListener("beforeunload", evento => {
+        if (formularioAlterado && !podeSair) {
+            evento.preventDefault();
+            evento.returnValue = "";
+        }
+    });
+</script>
+
+{% endblock %}
